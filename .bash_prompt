@@ -1,0 +1,77 @@
+#!/usr/local/bin/bash
+
+#
+# bash-prompt
+#
+# Improved bash prompt with support for Git.
+# github.com/sblaurock/bash-prompt
+# Version 1.0
+#
+
+# Define colors
+COLOR_DEFAULT="\[\e[39m\]"
+COLOR_RED="\[\e[31m\]"
+COLOR_GREEN="\[\e[32m\]"
+COLOR_YELLOW="\[\e[33m\]"
+COLOR_BLUE="\[\e[34m\]"
+COLOR_MAGENTA="\[\e[35m\]"
+COLOR_CYAN="\[\e[36m\]"
+COLOR_LIGHT_GRAY="\[\e[37m\]"
+COLOR_GRAY="\[\e[90m\]"
+COLOR_LIGHT_RED="\[\e[91m\]"
+COLOR_LIGHT_GREEN="\[\e[92m\]"
+COLOR_LIGHT_YELLOW="\[\e[93m\]"
+COLOR_LIGHT_BLUE="\[\e[94m\]"
+COLOR_LIGHT_MAGENTA="\[\e[95m\]"
+COLOR_LIGHT_CYAN="\[\e[96m\]"
+COLOR_WHITE="\[\e[97m\]"
+
+# Options
+SHOW_GIT=true
+SHOW_USERNAME=true
+SHOW_HOSTNAME=true
+SHOW_DIR=true
+SYMBOL="$ "
+NAME_DIVIDER="/"
+GIT_COLOR=$COLOR_RED
+USERNAME_COLOR=$COLOR_YELLOW
+HOSTNAME_COLOR=$COLOR_YELLOW
+NAME_DIVIDER_COLOR=$COLOR_YELLOW
+DIR_COLOR=$COLOR_GREEN
+SYMBOL_COLOR=$COLOR_WHITE
+
+# Return the current Git branch name (or false)
+function git_branch() {
+	local branch="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
+
+	if [ ! -z $branch ]; then
+		echo $branch
+	fi
+}
+
+# Handles the conditional logic to get formatting based on options
+function get_ps1() {
+	if $SHOW_GIT ; then
+		local git="${GIT_COLOR}$(git_branch)${COLOR_DEFAULT} "
+	fi
+
+	if $SHOW_USERNAME ; then
+		local username="${USERNAME_COLOR}\u${COLOR_DEFAULT}"
+	fi
+
+	if $SHOW_HOSTNAME ; then
+		if $SHOW_USERNAME ; then
+			local divider="${NAME_DIVIDER_COLOR}${NAME_DIVIDER}${COLOR_DEFAULT}"
+		fi
+
+		local hostname="${divider}${HOSTNAME_COLOR}\h${COLOR_DEFAULT} "
+	fi
+
+	if $SHOW_DIR ; then
+		local dir="${DIR_COLOR}\w${COLOR_DEFAULT} "
+	fi
+
+	echo -e "${username}${hostname}${dir}${git}${SYMBOL_COLOR}${SYMBOL}${COLOR_DEFAULT}"
+}
+
+PS1="$(get_ps1)"
