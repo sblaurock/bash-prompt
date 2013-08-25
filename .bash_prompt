@@ -31,8 +31,8 @@ SHOW_GIT=true
 SHOW_USERNAME=true
 SHOW_HOSTNAME=true
 SHOW_DIR=true
-SYMBOL="$ "
-NAME_DIVIDER="/"
+SYMBOL=" $ "
+NAME_DIVIDER="@"
 GIT_COLOR=$COLOR_RED
 USERNAME_COLOR=$COLOR_YELLOW
 HOSTNAME_COLOR=$COLOR_YELLOW
@@ -46,32 +46,52 @@ function git_branch() {
 
 	if [ ! -z $branch ]; then
 		echo $branch
+	else
+		echo "-"
 	fi
 }
 
 # Handles the conditional logic to get formatting based on options
 function get_ps1() {
-	if $SHOW_GIT ; then
-		local git="${GIT_COLOR}$(git_branch)${COLOR_DEFAULT} "
-	fi
+	local firstItem=true
+	local spacer=''
 
-	if $SHOW_USERNAME ; then
-		local username="${USERNAME_COLOR}\u${COLOR_DEFAULT}"
-	fi
+	if $SHOW_USERNAME || $SHOW_HOSTNAME ; then
+		$firstItem && spacer='' || spacer=' '
 
-	if $SHOW_HOSTNAME ; then
-		if $SHOW_USERNAME ; then
-			local divider="${NAME_DIVIDER_COLOR}${NAME_DIVIDER}${COLOR_DEFAULT}"
+		if $SHOW_USERNAME && $SHOW_HOSTNAME ; then
+			local divider=${NAME_DIVIDER_COLOR}${NAME_DIVIDER}${COLOR_DEFAULT}
 		fi
 
-		local hostname="${divider}${HOSTNAME_COLOR}\h${COLOR_DEFAULT} "
+		if $SHOW_USERNAME ; then
+			local username=${USERNAME_COLOR}"\u"${COLOR_DEFAULT}
+		fi
+
+		if $SHOW_HOSTNAME ; then
+			local hostname=${HOSTNAME_COLOR}"\h"${COLOR_DEFAULT}
+		fi
+
+		firstItem=false
+		local name=$spacer$username$divider$hostname
 	fi
 
 	if $SHOW_DIR ; then
-		local dir="${DIR_COLOR}\w${COLOR_DEFAULT} "
+		$firstItem && spacer='' || spacer=' '
+
+		firstItem=false
+		local dir=$spacer${DIR_COLOR}"\w"${COLOR_DEFAULT}
 	fi
 
-	echo -e "${username}${hostname}${dir}${git}${SYMBOL_COLOR}${SYMBOL}${COLOR_DEFAULT}"
+	if $SHOW_GIT ; then
+		$firstItem && spacer='' || spacer=' '
+
+		firstItem=false
+		local git=$spacer${GIT_COLOR}"\$(git_branch)"${COLOR_DEFAULT}
+	fi
+
+	local symbol=${SYMBOL_COLOR}${SYMBOL}${COLOR_DEFAULT}
+
+	echo -e "${name}${dir}${git}${symbol}"
 }
 
 PS1="$(get_ps1)"
