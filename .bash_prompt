@@ -32,12 +32,13 @@ SHOW_USERNAME=true
 SHOW_HOSTNAME=true
 SHOW_DIR=true
 SYMBOL=" $ "
+SPACER=" > "
 NAME_DIVIDER="@"
 GIT_COLOR=$COLOR_RED
-USERNAME_COLOR=$COLOR_YELLOW
-HOSTNAME_COLOR=$COLOR_YELLOW
-NAME_DIVIDER_COLOR=$COLOR_YELLOW
-DIR_COLOR=$COLOR_GREEN
+USERNAME_COLOR=$COLOR_LIGHT_MAGENTA
+HOSTNAME_COLOR=$COLOR_LIGHT_MAGENTA
+NAME_DIVIDER_COLOR=$COLOR_LIGHT_MAGENTA
+DIR_COLOR=$COLOR_MAGENTA
 SYMBOL_COLOR=$COLOR_WHITE
 
 # Return the current Git branch name (or false)
@@ -57,7 +58,7 @@ function get_ps1() {
 	local spacer=''
 
 	if $SHOW_USERNAME || $SHOW_HOSTNAME ; then
-		$firstItem && spacer='' || spacer=' '
+		$firstItem && spacer='' || spacer=$SPACER
 
 		if $SHOW_USERNAME && $SHOW_HOSTNAME ; then
 			local divider=${NAME_DIVIDER_COLOR}${NAME_DIVIDER}${COLOR_DEFAULT}
@@ -76,14 +77,14 @@ function get_ps1() {
 	fi
 
 	if $SHOW_DIR ; then
-		$firstItem && spacer='' || spacer=' '
+		$firstItem && spacer='' || spacer=$SPACER
 
 		firstItem=false
 		local dir=$spacer${DIR_COLOR}"\w"${COLOR_DEFAULT}
 	fi
 
 	if $SHOW_GIT ; then
-		$firstItem && spacer='' || spacer=' '
+		$firstItem && spacer='' || spacer=$SPACER
 
 		firstItem=false
 		local git=$spacer${GIT_COLOR}"\$(git_branch)"${COLOR_DEFAULT}
