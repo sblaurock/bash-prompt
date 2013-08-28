@@ -27,18 +27,19 @@ COLOR_LIGHT_CYAN="\[\e[96m\]"
 COLOR_WHITE="\[\e[97m\]"
 
 # Options
-SHOW_GIT=true
 SHOW_USERNAME=true
 SHOW_HOSTNAME=true
-SHOW_DIR=true
-SYMBOL=" $ "
-SPACER=" > "
+SHOW_CWD=true
+SHOW_GIT=true
 NAME_DIVIDER="@"
-GIT_COLOR=$COLOR_RED
+SPACER=" > "
+FULL_CWD=false
+SYMBOL=" $ "
 USERNAME_COLOR=$COLOR_LIGHT_MAGENTA
-HOSTNAME_COLOR=$COLOR_LIGHT_MAGENTA
 NAME_DIVIDER_COLOR=$COLOR_LIGHT_MAGENTA
-DIR_COLOR=$COLOR_MAGENTA
+HOSTNAME_COLOR=$COLOR_LIGHT_MAGENTA
+CWD_COLOR=$COLOR_MAGENTA
+GIT_COLOR=$COLOR_RED
 SYMBOL_COLOR=$COLOR_WHITE
 
 # Return the current Git branch name (or false)
@@ -76,11 +77,12 @@ function get_ps1() {
 		local name=$spacer$username$divider$hostname
 	fi
 
-	if $SHOW_DIR ; then
+	if $SHOW_CWD ; then
 		$firstItem && spacer='' || spacer=$SPACER
+		$FULL_CWD && cwdType="\w" || cwdType="\${PWD#\${PWD%/*/*}}"
 
 		firstItem=false
-		local dir=$spacer${DIR_COLOR}"\w"${COLOR_DEFAULT}
+		local cwd=$spacer${CWD_COLOR}$cwdType${COLOR_DEFAULT}
 	fi
 
 	if $SHOW_GIT ; then
@@ -92,7 +94,7 @@ function get_ps1() {
 
 	local symbol=${SYMBOL_COLOR}${SYMBOL}${COLOR_DEFAULT}
 
-	echo -e "${name}${dir}${git}${symbol}"
+	echo -e "${name}${cwd}${git}${symbol}"
 }
 
 PS1="$(get_ps1)"
