@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 
 #
 # bash-prompt
@@ -41,6 +41,7 @@ HOSTNAME_COLOR=$COLOR_LIGHT_MAGENTA
 CWD_COLOR=$COLOR_MAGENTA
 GIT_COLOR=$COLOR_RED
 SYMBOL_COLOR=$COLOR_WHITE
+SPACER_COLOR=$COLOR_GRAY
 
 # Return the current Git branch name (or false)
 function git_branch() {
@@ -48,18 +49,25 @@ function git_branch() {
 
 	if [ ! -z $branch ]; then
 		echo $branch
-	else
-		echo "-"
 	fi
 }
 
-# Handles the conditional logic to get formatting based on options
-function get_ps1() {
+# Are we in a Git repository?
+function on_git() {
+	if $(git rev-parse --is-inside-work-tree 2> /dev/null); then
+		return 0
+	fi
+
+	return 1
+}
+
+# Sets bash prompt based on the values defined within options
+function set_ps1() {
 	local firstItem=true
 	local spacer=''
 
 	if $SHOW_USERNAME || $SHOW_HOSTNAME ; then
-		$firstItem && spacer='' || spacer=$SPACER
+		$firstItem && spacer='' || spacer=${SPACER_COLOR}${SPACER}${SPACER_COLOR}
 
 		if $SHOW_USERNAME && $SHOW_HOSTNAME ; then
 			local divider=${NAME_DIVIDER_COLOR}${NAME_DIVIDER}${COLOR_DEFAULT}
@@ -73,28 +81,28 @@ function get_ps1() {
 			local hostname=${HOSTNAME_COLOR}"\h"${COLOR_DEFAULT}
 		fi
 
-		firstItem=false
-		local name=$spacer$username$divider$hostname
+		local firstItem=false
+		local name=${spacer}${username}${divider}${hostname}
 	fi
 
 	if $SHOW_CWD ; then
-		$firstItem && spacer='' || spacer=$SPACER
+		$firstItem && spacer='' || spacer=${SPACER_COLOR}${SPACER}${SPACER_COLOR}
 		$FULL_CWD && cwdType="\w" || cwdType="\${PWD#\${PWD%/*/*}}"
 
-		firstItem=false
-		local cwd=$spacer${CWD_COLOR}$cwdType${COLOR_DEFAULT}
+		local firstItem=false
+		local cwd=${spacer}${CWD_COLOR}${cwdType}${COLOR_DEFAULT}
 	fi
 
 	if $SHOW_GIT ; then
-		$firstItem && spacer='' || spacer=$SPACER
+		$firstItem && spacer='' || spacer=${SPACER_COLOR}${SPACER}${SPACER_COLOR}
 
-		firstItem=false
-		local git=$spacer${GIT_COLOR}"\$(git_branch)"${COLOR_DEFAULT}
+		local firstItem=false
+		local git=${spacer}${GIT_COLOR}"\$(git_branch)"${COLOR_DEFAULT}
 	fi
 
 	local symbol=${SYMBOL_COLOR}${SYMBOL}${COLOR_DEFAULT}
 
-	echo -e "${name}${cwd}${git}${symbol}"
+	PS1="${name}${cwd}\$( on_git && echo \"\[${git}\]\" )${symbol}"
 }
 
-PS1="$(get_ps1)"
+set_ps1
