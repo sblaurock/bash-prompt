@@ -5,7 +5,6 @@
 #
 # Improved bash prompt with support for Git.
 # github.com/sblaurock/bash-prompt
-# Version 1.0
 #
 
 # Define colors
@@ -29,19 +28,22 @@ COLOR_WHITE="\[\e[97m\]"
 # Options
 SHOW_USERNAME=true
 SHOW_HOSTNAME=true
+	NAME_DIVIDER="@"
+	USERNAME_COLOR=$COLOR_LIGHT_MAGENTA
+	HOSTNAME_COLOR=$COLOR_LIGHT_MAGENTA
+	NAME_DIVIDER_COLOR=$COLOR_LIGHT_MAGENTA
 SHOW_CWD=true
+	FULL_CWD=false
+	CWD_COLOR=$COLOR_MAGENTA
 SHOW_GIT=true
-NAME_DIVIDER="@"
+	SHOW_GIT_DIRTY=true
+		GIT_DIRTY_SYMBOL=" *"
+		GIT_DIRTY_COLOR=$COLOR_LIGHT_RED
+	GIT_COLOR=$COLOR_RED
 SPACER=" > "
-FULL_CWD=false
+	SPACER_COLOR=$COLOR_GRAY
 SYMBOL=" $ "
-USERNAME_COLOR=$COLOR_LIGHT_MAGENTA
-NAME_DIVIDER_COLOR=$COLOR_LIGHT_MAGENTA
-HOSTNAME_COLOR=$COLOR_LIGHT_MAGENTA
-CWD_COLOR=$COLOR_MAGENTA
-GIT_COLOR=$COLOR_RED
-SYMBOL_COLOR=$COLOR_WHITE
-SPACER_COLOR=$COLOR_GRAY
+	SYMBOL_COLOR=$COLOR_WHITE
 
 # Return the current Git branch name (or false)
 function git_branch() {
@@ -59,6 +61,15 @@ function on_git() {
 	fi
 
 	return 1
+}
+
+# Is our Git branch dirty?
+function git_dirty() {
+	if $(git diff-index --quiet HEAD 2> /dev/null); then
+		return 1
+	fi
+
+	return 0
 }
 
 # Sets bash prompt based on the values defined within options
@@ -81,7 +92,7 @@ function set_ps1() {
 			local hostname=${HOSTNAME_COLOR}"\h"${COLOR_DEFAULT}
 		fi
 
-		local firstItem=false
+		firstItem=false
 		local name=${spacer}${username}${divider}${hostname}
 	fi
 
@@ -89,20 +100,24 @@ function set_ps1() {
 		$firstItem && spacer='' || spacer=${SPACER_COLOR}${SPACER}${SPACER_COLOR}
 		$FULL_CWD && cwdType="\w" || cwdType="\${PWD#\${PWD%/*/*}}"
 
-		local firstItem=false
+		firstItem=false
 		local cwd=${spacer}${CWD_COLOR}${cwdType}${COLOR_DEFAULT}
 	fi
 
 	if $SHOW_GIT ; then
 		$firstItem && spacer='' || spacer=${SPACER_COLOR}${SPACER}${SPACER_COLOR}
 
-		local firstItem=false
+		if $SHOW_GIT_DIRTY ; then
+			local dirty=${GIT_DIRTY_COLOR}${GIT_DIRTY_SYMBOL}${COLOR_DEFAULT}
+		fi
+
+		firstItem=false
 		local git=${spacer}${GIT_COLOR}"\$(git_branch)"${COLOR_DEFAULT}
 	fi
 
 	local symbol=${SYMBOL_COLOR}${SYMBOL}${COLOR_DEFAULT}
 
-	PS1="${name}${cwd}\$( on_git && echo \"\[${git}\]\" )${symbol}"
+	PS1="${name}${cwd}\$(on_git && echo \"\[${git}\]\"\$(git_dirty && echo \"\[${dirty}\]\"))${symbol}"
 }
 
 set_ps1
