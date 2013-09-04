@@ -1,5 +1,8 @@
 #!/bin/bash
 
+COLOR_GREEN="\[\e[92m\]"
+COLOR_DEFAULT="\[\e[39m\]"
+
 # Check if a .bash_prompt file already exists. If so and it's not ours, let's back it up
 if [[ -f ~/.bash_prompt ]]; then
 	if ! cat ~/.bash_prompt | grep -q "github.com/sblaurock/bash-prompt"; then
@@ -41,5 +44,5 @@ fi
 cd ..
 rm -rf bash-prompt
 
-echo -e "\e[32mInstallation Complete:\e[39m View ~/.bash_prompt for configuration options."
+echo -e "${COLOR_GREEN}Installation Complete:${COLOR_DEFAULT} View ~/.bash_prompt for configuration options."
 exit 0
