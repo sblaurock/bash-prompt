@@ -5,25 +5,26 @@
 #
 # Improved bash prompt with support for Git.
 # github.com/sblaurock/bash-prompt
+# v1.1
 #
 
 # Define colors
-COLOR_DEFAULT="\[\e[39m\]"
-COLOR_RED="\[\e[31m\]"
-COLOR_GREEN="\[\e[32m\]"
-COLOR_YELLOW="\[\e[33m\]"
-COLOR_BLUE="\[\e[34m\]"
-COLOR_MAGENTA="\[\e[35m\]"
-COLOR_CYAN="\[\e[36m\]"
-COLOR_LIGHT_GRAY="\[\e[37m\]"
-COLOR_GRAY="\[\e[90m\]"
-COLOR_LIGHT_RED="\[\e[91m\]"
-COLOR_LIGHT_GREEN="\[\e[92m\]"
-COLOR_LIGHT_YELLOW="\[\e[93m\]"
-COLOR_LIGHT_BLUE="\[\e[94m\]"
-COLOR_LIGHT_MAGENTA="\[\e[95m\]"
-COLOR_LIGHT_CYAN="\[\e[96m\]"
-COLOR_WHITE="\[\e[97m\]"
+COLOR_DEFAULT='\[\e[39m\]'
+COLOR_RED='\[\e[31m\]'
+COLOR_GREEN='\[\e[32m\]'
+COLOR_YELLOW='\[\e[33m\]'
+COLOR_BLUE='\[\e[34m\]'
+COLOR_MAGENTA='\[\e[35m\]'
+COLOR_CYAN='\[\e[36m\]'
+COLOR_LIGHT_GRAY='\[\e[37m\]'
+COLOR_GRAY='\[\e[90m\]'
+COLOR_LIGHT_RED='\[\e[91m\]'
+COLOR_LIGHT_GREEN='\[\e[92m\]'
+COLOR_LIGHT_YELLOW='\[\e[93m\]'
+COLOR_LIGHT_BLUE='\[\e[94m\]'
+COLOR_LIGHT_MAGENTA='\[\e[95m\]'
+COLOR_LIGHT_CYAN='\[\e[96m\]'
+COLOR_WHITE='\[\e[97m\]'
 
 # Options
 SHOW_USERNAME=true
@@ -126,7 +127,7 @@ function set_ps1() {
 
 	local symbol=${SYMBOL_COLOR}${SYMBOL}${COLOR_DEFAULT}
 
-	PS1="${name}${cwd}\$(on_git && echo \"\[${git}\]\"\$(git_dirty && echo \"\[${dirty}\]\"))${symbol}"
+	echo "${name}${cwd}\$(on_git && echo \"${git}\"\$(git_dirty && echo \"${dirty}\"))${symbol}"
 }
 
-set_ps1
+export PS1=$(set_ps1)
